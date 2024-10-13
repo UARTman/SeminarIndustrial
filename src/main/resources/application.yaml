@@ -1,0 +1,10 @@
+postgres:
+  host: $POSTGRES_HOST
+  user: $POSTGRES_USER
+  password: $POSTGRES_PASSWORD
+ktor:
+  deployment:
+    port: 8080
+  application:
+    modules:
+      - site.uartman.ApplicationKt.module

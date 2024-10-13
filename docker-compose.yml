@@ -1,0 +1,38 @@
+volumes:
+  pgdata:
+
+services:
+  webserver:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+
+  db:
+    image: postgres
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    # or set shared memory limit when deploy via swarm stack
+    #volumes:
+    #  - type: tmpfs
+    #    target: /dev/shm
+    #    tmpfs:
+    #      size: 134217728 # 128*2^20 bytes = 128Mb
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d seminar_industrial" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+    environment:
+      POSTGRES_DB: seminar_industrial
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    volumes:
+      - pgdata:/var/lib/postgresql/data
